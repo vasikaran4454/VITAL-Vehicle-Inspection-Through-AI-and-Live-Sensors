@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#060a13">
+<title>VITAL — Vehicle Inspection Through AI and Live Sensors</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div id="toasts"></div>
+
+<!-- WELCOME -->
+<div id="welcome">
+  <div class="grid"></div><div class="glow"></div>
+  <div class="wl">
+    <svg width="84" height="84" viewBox="0 0 90 90" fill="none"><rect x="5" y="5" width="80" height="80" rx="16" stroke="#00e68a" stroke-width="2" opacity=".35"/><rect x="15" y="15" width="60" height="60" rx="10" stroke="#00e68a" stroke-width="1.5" opacity=".18"/><path d="M30 58V32L45 45L60 32V58" stroke="#00e68a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="45" cy="28" r="4" fill="#00e68a" opacity=".7"/></svg>
+    <h1 class="vt"><span>V</span><span>I</span><span>T</span><span>A</span><span>L</span></h1>
+    <p class="ff"><b>V</b>ehicle <b>I</b>nspection <b>T</b>hrough <b>A</b>I and <b>L</b>ive Sensors</p>
+    <p style="font-size:13px;color:var(--t3)">IoT-Based Vehicle Health Monitoring with AI Visual Fault Detection</p>
+    <div class="feat">
+      <div><i class="fas fa-microchip"></i>ESP32 Live</div>
+      <div><i class="fas fa-brain"></i>AI Detection</div>
+      <div><i class="fas fa-shield-halved"></i>Health Score</div>
+    </div>
+    <button class="go" onclick="enter()">Launch Dashboard</button>
+    <p style="margin-top:18px;font-size:12px;color:var(--t3)">Connect your ESP32 for live monitoring</p>
+  </div>
+</div>
+
+<!-- SIDEBAR / BOTTOM NAV -->
+<aside class="side">
+  <div class="brand">
+    <svg width="36" height="36" viewBox="0 0 90 90" fill="none"><rect x="5" y="5" width="80" height="80" rx="16" stroke="#00e68a" stroke-width="3"/><path d="M30 58V32L45 45L60 32V58" stroke="#00e68a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div><b>VITAL</b><small>Vehicle Inspection System</small></div>
+  </div>
+  <div class="panel"><div class="lbl"><i class="fas fa-wifi"></i> ESP32 Connection</div><div class="conn"></div></div>
+  <nav class="nav">
+    <div class="lbl" style="padding:0 20px">Monitoring</div>
+    <button class="ni on" data-t="live"><i class="fas fa-heart-pulse"></i><span>Live</span></button>
+    <button class="ni" data-t="charts"><i class="fas fa-chart-area"></i><span>Charts</span></button>
+    <button class="ni" data-t="inspect"><i class="fas fa-magnifying-glass"></i><span>AI Scan</span></button>
+    <button class="ni" data-t="alerts"><i class="fas fa-triangle-exclamation"></i><span>Alerts</span><b class="cnt" id="ac">0</b></button>
+    <button class="ni mo" data-t="link"><i class="fas fa-wifi"></i><span>ESP32</span></button>
+    <button class="ni" data-t="info"><i class="fas fa-circle-info"></i><span>Info</span></button>
+  </nav>
+</aside>
+
+<main>
+  <header class="top">
+    <div><h2 id="pt">Live Sensor Monitor</h2><p id="ps">Real-time vehicle vital signs from ESP32</p></div>
+    <div class="hr">
+      <div class="pill" onclick="go('link')"><span class="dot"></span><span class="stt">Not Connected</span></div>
+      <div class="clock"><span id="ck">--:--:--</span><small id="cd"></small></div>
+    </div>
+  </header>
+
+  <!-- LIVE -->
+  <section class="tab on" id="t-live">
+    <div class="g live">
+      <div class="g" style="align-content:start">
+        <div class="g sg" id="cards"></div>
+        <div class="card"><h3><i class="fas fa-bell" style="color:var(--am)"></i> Recent Alerts</h3><div id="ra"></div></div>
+      </div>
+      <div class="g" style="align-content:start">
+        <div class="card" style="text-align:center"><h3 style="text-align:left">Vehicle Health</h3>
+          <div class="ring"><svg width="170" height="170" viewBox="0 0 180 180"><circle cx="90" cy="90" r="78" stroke="#1e2d4a"/><circle id="rfg" cx="90" cy="90" r="78" stroke="#00e68a" stroke-dasharray="490" stroke-dashoffset="490"/></svg>
+            <div class="rt"><span class="fd" id="hs" style="font-size:40px;font-weight:700;color:var(--t3)">--</span><span class="lbl" style="margin:0">Score</span></div></div>
+          <div id="hl" style="font-weight:600;color:var(--t3)">Waiting for ESP32</div>
+        </div>
+        <div class="card"><h3>Session Stats</h3>
+          <div class="row"><span>Data Points</span><b class="fd" id="sp">0</b></div>
+          <div class="row"><span>ESP32 Uptime</span><b class="fd" id="su">0s</b></div>
+          <div class="row"><span>Source</span><b id="ss" style="color:var(--ac);font-size:12px">None</b></div>
+          <div class="row"><span>Peak Temp</span><b class="fd" id="spk">--</b></div>
+          <div class="row"><span>Peak Current</span><b class="fd" id="sav">--</b></div>
+        </div>
+        <div class="card"><h3>Pack Voltage Trend</h3><div class="chart" style="height:110px"><canvas id="c-mini"></canvas></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHARTS -->
+  <section class="tab" id="t-charts">
+    <div class="g g2">
+      <div class="card"><h3>Cell Voltages (V)</h3><div class="chart"><canvas id="c-cells"></canvas></div></div>
+      <div class="card"><h3>Temperatures (°C)</h3><div class="chart"><canvas id="c-temps"></canvas></div></div>
+      <div class="card"><h3>Current (mA)</h3><div class="chart"><canvas id="c-cur"></canvas></div></div>
+      <div class="card"><h3>Vibration &amp; Noise</h3><div class="chart"><canvas id="c-vn"></canvas></div></div>
+    </div>
+  </section>
+
+  <!-- AI INSPECT -->
+  <section class="tab" id="t-inspect">
+    <div class="g g2">
+      <div class="card"><h3><i class="fas fa-camera" style="color:var(--ac)"></i> Upload Vehicle Photo</h3>
+        <select class="in" id="part"><option value="tyre">Tyre</option><option value="battery">Battery</option><option value="brake">Brake (disc / pad)</option><option value="engine">Engine bay</option><option value="dash">Dashboard warning lights</option></select>
+        <div class="drop" id="drop"><input type="file" accept="image/*" id="fi">
+          <div id="dc"><i class="fas fa-cloud-arrow-up" style="font-size:30px;color:var(--t3);margin-bottom:10px"></i><p style="font-size:14px;font-weight:600;color:var(--t2)">Tap to take / upload photo</p><p style="font-size:12px;color:var(--t3);margin-top:4px">Engine, tyres, brakes, battery</p></div>
+          <div id="pv" class="hide"><img id="pi" alt=""><p id="pn" style="font-size:12px;color:var(--t3);margin-top:8px"></p></div>
+        </div>
+        <button class="btn hide" id="ba" onclick="analyze()"><i class="fas fa-magnifying-glass-chart"></i> Run AI Inspection</button>
+      </div>
+      <div class="card"><h3><i class="fas fa-clipboard-check" style="color:var(--ac)"></i> Results</h3>
+        <div id="ir"><div class="empty"><i class="fas fa-search" style="font-size:34px;opacity:.3;display:block;margin-bottom:12px"></i>Part select pannitu photo upload pannunga</div></div></div>
+    </div>
+    <div class="card" style="margin-top:16px"><h3>Inspection History</h3><div id="ih"><div class="empty">No inspections yet</div></div></div>
+  </section>
+
+  <!-- ALERTS -->
+  <section class="tab" id="t-alerts">
+    <div class="card"><div class="sh"><h3 style="margin:0">All Alerts</h3><button class="tag" style="background:var(--bg);color:var(--t3);border:1px solid var(--bd);cursor:pointer;padding:6px 12px" onclick="clearAl()">Clear</button></div><div id="aa"></div></div>
+    <div class="card" style="margin-top:16px"><h3>Alarm Limits (set in ESP32 firmware)</h3>
+      <div class="row"><span>Cell voltage</span><b>3.00 V to 4.25 V</b></div>
+      <div class="row"><span>Temperature</span><b>&gt; 40 °C</b></div>
+      <div class="row"><span>Current</span><b>&gt; 1000 mA</b></div>
+      <div class="row"><span>Tilt / Vibration</span><b>&gt; 30° / &gt; 2 m/s²</b></div>
+      <div class="row"><span>Noise</span><b>&gt; 85 dB</b></div>
+      <div class="row"><span>Oil purity</span><b>GOOD ≥ 70 %, FAIR ≥ 40 %, else POOR</b></div>
+      <div class="row"><span>Metal / Insulation</span><b>Metal detected or insulation fail = alarm</b></div>
+    </div>
+  </section>
+
+  <!-- LINK (mobile connect) -->
+  <section class="tab" id="t-link">
+    <div class="card"><h3><i class="fas fa-wifi" style="color:var(--ac)"></i> ESP32 Connection</h3><div class="conn"></div></div>
+  </section>
+
+  <!-- INFO -->
+  <section class="tab" id="t-info">
+    <div class="g g2">
+      <div class="card"><h3>ESP32 Data Format</h3>
+        <pre class="js">{"cells":[3.91,3.90,3.93],"pack":11.74,"temps":[27.5,28.1,null],
+ "current_ma":420.5,"vib":0.12,"noise_db":48.2,
+ "oil_pct":82.5,"metal":false,"insulation":true, ...}</pre>
+        <div class="row"><span>Endpoint</span><b>/data</b></div><div class="row"><span>Poll rate</span><b>1 second</b></div><div class="row"><span>Board</span><b>ESP32-S3</b></div><div class="row"><span>CORS</span><b style="color:var(--ac)">Enabled in .ino</b></div></div>
+      <div class="card"><h3>Cannot Connect?</h3><ol>
+        <li>Open <code>http://IP/data</code> in browser, JSON varudha?</li>
+        <li>Laptop/phone and ESP32 same Wi-Fi la irukkanum</li>
+        <li><code>Access-Control-Allow-Origin</code> line .ino la remove pannadheenga</li>
+        <li>Phone la use panna, ESP32 IP type pannunga (http only)</li></ol></div>
+    </div>
+  </section>
+</main>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>
